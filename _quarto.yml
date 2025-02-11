@@ -1,0 +1,30 @@
+project:
+  type: book
+  title: Statistical Computing
+  output-dir: _book
+  
+website:
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: prac1.qmd
+        text: Second page
+      - href: prac2.qmd
+        text: Third page
+      - href: prac_day_4.qmd
+        text: Fourth page
+book:
+  chapters:
+  - index.qmd
+  - prac1.qmd
+  - prac2.qmd
+  - prac_day_4.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-location: left
+

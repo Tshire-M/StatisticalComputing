@@ -1,0 +1,66 @@
+# Lowess Practical
+
+## 1. Generate simulated data
+
+```{r}
+#| echo: true
+
+set.seed(1)
+x <- 1:100
+y <- sin(x/10) + rnorm(100,0,0.2)
+```
+
+## 2. Implement the LOWESS Algorithm
+
+```{r}
+#| echo: true
+
+customLowess <- function(x,y,f){ 
+  k <- ceiling(f*100)
+  y_hat <- numeric(100) #wghts <- c() #ngb <- x[1:k]
+  for (i in 1:100){ 
+    # find the nearest k neighbors 
+    distances <- abs(x-x[i]) 
+    sortedIndices <- sort.list(distances) 
+    nearest_indices <- sortedIndices[1:k]
+
+    x_ngb <- x[nearest_indices]
+    y_ngb <- y[nearest_indices]
+
+    dmax <- max(distances[nearest_indices])
+    wghts <- (1- (distances[nearest_indices]/dmax)^3)^3
+    W <- diag(wghts)
+
+    X <- cbind(1,x_ngb)
+    beta <- solve(t(X)%*%W%*%X)%*%t(X)%*%W%*%y_ngb
+    y_hat[i] <- c(1,x[i])%*%beta
+  } 
+  return(y_hat) 
+}
+```
+
+### 2.1 Comparing values from different functions
+
+We now need to check if the custom function yields the same results as the in-built R lowess() function. For this we render the following code:
+
+```{r}
+#| echo: true
+
+customLowess(x,y,0.1)
+lowess(x,y, f = 0.1, iter = 0)
+```
+
+## 3. Plots
+
+We then plot the original data and the smoothed data for comparison:
+
+```{r}
+#| echo: true
+
+smooth_y <- customLowess(x,y,0.1)
+plot(y~x)
+plot(smooth_y ~ x)
+
+```
+
+From the plots, we can see that the lowess function produces less scattered values compared to the original data points.

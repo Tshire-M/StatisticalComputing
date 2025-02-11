@@ -1,0 +1,82 @@
+## Statistical Computing Prac 1
+
+## Question 1
+
+```{r}
+#| echo: false
+
+df <- airquality
+
+## Identify rows with missing values
+
+missing_rows <- df[rowSums(is.na(df))> 0,]
+print(missing_rows)
+
+```
+
+The table shows the missing values as obtained from the original data.
+
+## Question 2
+
+```{r}
+#| echo: false
+
+new_df <- na.omit(df)  # Removing missing values
+
+## Mean
+mean(new_df$Temp)
+mean(new_df$Ozone)
+
+## StDev
+sd(new_df$Temp)
+sd(new_df$Ozone)
+
+## Max
+max(new_df$Temp)
+max(new_df$Ozone)
+
+## Min
+min(new_df$Temp)
+min(new_df$Ozone)
+```
+
+## Question 3
+
+```{r}
+#| echo: false
+
+dat <- cars
+
+X <- cbind(1,dat$speed) # Add a column of ones for intercept
+Y <- dat$dist
+
+beta <- solve(t(X)%*%X)%*%t(X)%*%Y
+fit <- lm(Y~X, data = dat)
+summary(fit)
+
+beta
+```
+
+```{r}
+#| echo: false
+
+# function to calculate the relevant statistics
+
+f <- function(X,Y){
+  beta <- solve(t(X)%*%X)%*%t(X)%*%Y
+  stdev <- 1/48*t(Y-X%*%beta)%*%(Y-X%*%beta)
+  covr <- as.numeric(stdev)*solve(t(X)%*%X)
+  se_beta <- sqrt(diag(covr))
+  t_stat0 <- beta[1,]/se_beta[1]
+  t_stat1 <- beta[2,]/se_beta[2]
+  p_val0 <- 2*(pt(q = t_stat0,df = 48, lower.tail = FALSE))
+  p_val1 <- 2*(pt(q = t_stat1,df = 48, lower.tail = FALSE)) ##Issues with p value
+  
+  return(list('coefficients'= beta,'t_stat'= c(t_stat0,t_stat1),'p-values'= c(p_val0,p_val1)))
+  
+}
+
+b_values <- f(X,Y)
+```
+
+The analysis shows that the calculated Beta values are consistent with the values obtained from the lm function.
